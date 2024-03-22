@@ -20,6 +20,10 @@ struct ResortView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
+                Text("©\(resort.imageCredit)")
+                    .padding(.leading, 5)
+                    .font(.caption2)
+                
                 Image(decorative: resort.id)
                     .resizable()
                     .scaledToFit()

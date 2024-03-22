@@ -8,16 +8,30 @@
 import SwiftUI
 
 struct ContentView: View {
+    enum SortingOption {
+        case `default`, alphabetical, byCountry
+    }
+    
     let resorts: [Resort] = Bundle.main.decode("resorts.json")
     
     @State private var favorites = Favorites()
     @State private var searchText = ""
+    @State private var sortingOption: SortingOption = .default
     
     var filteredResorts: [Resort] {
-        if searchText.isEmpty {
-            resorts
-        } else {
-            resorts.filter { $0.name.localizedStandardContains(searchText)}
+        var filtered = resorts
+        
+        if !searchText.isEmpty {
+            filtered = filtered.filter { $0.name.localizedStandardContains(searchText) }
+        }
+        
+        switch sortingOption {
+        case .default:
+            return filtered
+        case .alphabetical:
+            return filtered.sorted { $0.name < $1.name }
+        case .byCountry:
+            return filtered.sorted { $0.country < $1.country }
         }
     }
     
@@ -60,6 +74,15 @@ struct ContentView: View {
                 ResortView(resort: resort)
             }
             .searchable(text: $searchText, prompt: "Search for a resort")
+            .toolbar {
+                Menu("Sort", systemImage: "arrow.up.arrow.down") {
+                    Picker("Sort by:", selection: $sortingOption) {
+                        Text("Default").tag(SortingOption.default)
+                        Text("Alphabetical").tag(SortingOption.alphabetical)
+                        Text("By Country").tag(SortingOption.byCountry)
+                    }
+                }
+            }
         } detail: {
             WelcomeView()
         }

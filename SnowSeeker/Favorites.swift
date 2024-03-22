@@ -10,10 +10,16 @@ import SwiftUI
 @Observable
 class Favorites {
     private var resorts: Set<String>
-    private let key = "Favorites"
+    private static let key = "Favorites"
     
     init() {
         // load our saved data
+        if let data = UserDefaults.standard.data(forKey: Favorites.key) {
+            if let decoded = try? JSONDecoder().decode(Set<String>.self, from: data) {
+                resorts = decoded
+                return
+            }
+        }
         resorts = []
     }
     
@@ -31,8 +37,10 @@ class Favorites {
         save()
     }
     
-    func save() {
-        // write out all data
+    private func save() {
+        if let data = try? JSONEncoder().encode(resorts) {
+            UserDefaults.standard.set(data, forKey: Favorites.key)
+        }
     }
 }
 
